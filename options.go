@@ -16,3 +16,11 @@ func WithConsoleEncoding(config *zap.Config) {
 	config.Encoding = "console"
 	config.EncoderConfig = zap.NewDevelopmentEncoderConfig()
 }
+
+func DisableStacktrace(config *zap.Config) {
+	config.DisableStacktrace = true
+}
+
+func DisableCaller(config *zap.Config) {
+	config.DisableCaller = true
+}
