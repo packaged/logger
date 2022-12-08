@@ -5,14 +5,28 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
+	"reflect"
 	"testing"
 
 	"go.uber.org/zap"
 )
 
+func TestSingleton(t *testing.T) {
+	inst = nil
+	Init(DevelopmentInstance())
+	assert.NotNil(t, inst)
+	reflect.DeepEqual(inst, I())
+
+	logger := &Logger{zapper: zap.NewNop()}
+	Init(logger)
+	reflect.DeepEqual(logger, I())
+}
+
 func TestGlobalClone(t *testing.T) {
 	observedZapCore, observedLogs := observer.New(zap.InfoLevel)
 	observedLogger := zap.New(observedZapCore)
+
+	Init(nil)
 
 	assert.Panics(t, func() {
 		I().Info("test")
