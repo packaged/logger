@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// WithGoogleEncoding sets the encoding to google cloud logging format
 func WithGoogleEncoding(cfg *zap.Config) {
 	// encoder to match GCP payloads
 	// https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry

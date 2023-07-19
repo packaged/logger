@@ -77,7 +77,14 @@ func TestLogging(t *testing.T) {
 		l.Info(msg, fields...)
 		l.Warn(msg, fields...)
 		l.Error(msg, fields...)
-		l.Fatal(msg, fields...)
+
+		if msg == "dPanic" {
+			l.DPanic(msg, fields...)
+		} else if msg == "panic" {
+			l.Panic(msg, fields...)
+		} else {
+			l.Fatal(msg, fields...)
+		}
 	}
 	tests := []struct {
 		name       string
@@ -105,6 +112,16 @@ func TestLogging(t *testing.T) {
 			expectLogs: 2,
 		},
 		{
+			name:       "dPanic",
+			level:      zapcore.DPanicLevel,
+			expectLogs: 1,
+		},
+		{
+			name:       "panic",
+			level:      zapcore.PanicLevel,
+			expectLogs: 1,
+		},
+		{
 			name:       "fatal",
 			level:      zapcore.FatalLevel,
 			expectLogs: 1,
@@ -119,7 +136,7 @@ func TestLogging(t *testing.T) {
 				defer func() {
 					done <- recover()
 				}()
-				fn(l, "test")
+				fn(l, test.name)
 				done <- true
 			}()
 			<-done
