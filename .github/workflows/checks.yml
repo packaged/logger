@@ -23,8 +23,6 @@ jobs:
       - name: DependencyVulnerabilityScan
         uses: sonatype-nexus-community/nancy-github-action@main
 
-      - name: Go Mod Vendor
-        run: go mod vendor
       - name: Verify dependencies
         run: go mod verify
 
