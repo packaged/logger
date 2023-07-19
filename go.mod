@@ -1,4 +1,4 @@
-module github.com/packaged/logger
+module github.com/packaged/logger/v3
 
 go 1.20
 
