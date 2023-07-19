@@ -79,16 +79,6 @@ func TestMethod(t *testing.T) {
 	}
 }
 
-func TestTrustedString(t *testing.T) {
-	result := TrustedString("xrand", "abc")
-	if result.String != "abc" {
-		t.Errorf("TrustedString: got %s, want abc", result.String)
-	}
-	if result.Key != "xrand" {
-		t.Errorf("incorrect TrustedString key: got %s", result.Key)
-	}
-}
-
 func TestIP(t *testing.T) {
 	result := IP("abc")
 	if result.String != "abc" {

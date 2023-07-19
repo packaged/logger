@@ -4,4 +4,4 @@ Golang Logger
 
 ##Usage
 
-    logger.Instance(logger.WithGoogleEncoding, logger.Debug)
+    logger.Setup(environment.Development)
