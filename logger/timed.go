@@ -55,7 +55,8 @@ func (l *Logger) TimedLog(tl *TimedLog) {
 
 	tl.Complete()
 
-	nl := l.zapper.WithOptions(zap.AddCallerSkip(1))
+	nl := l.Clone()
+	nl.zapper = nl.zapper.WithOptions(zap.AddCallerSkip(1))
 	if tl.duration >= tl.config.ErrorDuration && tl.config.ErrorDuration > 0 {
 		nl.Error(tl.message, append(tl.fields, zap.Duration("duration", tl.duration))...)
 	} else if tl.duration >= tl.config.WarnDuration && tl.config.WarnDuration > 0 {
