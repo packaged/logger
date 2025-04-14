@@ -1,8 +1,9 @@
 package logger
 
 import (
-	"go.uber.org/zap"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 type TimedLogConfig struct {
@@ -47,20 +48,28 @@ func NewTimedLog(cnf *TimedLogConfig, message string, fields ...zap.Field) *Time
 	return &TimedLog{config: cnf, message: message, fields: fields, start: time.Now()}
 }
 
-func (l *Logger) TimedLog(tl *TimedLog) {
+func (l *Logger) TimedLog(tl *TimedLog, fields ...zap.Field) {
 	if l == nil || tl == nil {
 		return
 	}
 
 	tl.Complete()
 
+	nl := l.Clone()
+	nl.zapper = nl.zapper.WithOptions(zap.AddCallerSkip(1))
+
+	logFields := tl.fields
+	logFields = append(logFields, tl.fields...)
+	logFields = append(logFields, fields...)
+	logFields = append(logFields, zap.Duration("duration", tl.duration))
+
 	if tl.duration >= tl.config.ErrorDuration && tl.config.ErrorDuration > 0 {
-		l.Error(tl.message, append(tl.fields, zap.Duration("duration", tl.duration))...)
+		nl.Error(tl.message, logFields...)
 	} else if tl.duration >= tl.config.WarnDuration && tl.config.WarnDuration > 0 {
-		l.Warn(tl.message, append(tl.fields, zap.Duration("duration", tl.duration))...)
+		nl.Warn(tl.message, logFields...)
 	} else if tl.duration >= tl.config.InfoDuration && tl.config.InfoDuration > 0 {
-		l.Info(tl.message, append(tl.fields, zap.Duration("duration", tl.duration))...)
+		nl.Info(tl.message, logFields...)
 	} else if tl.duration >= tl.config.DebugDuration && tl.config.DebugDuration > 0 {
-		l.Debug(tl.message, append(tl.fields, zap.Duration("duration", tl.duration))...)
+		nl.Debug(tl.message, logFields...)
 	}
 }
