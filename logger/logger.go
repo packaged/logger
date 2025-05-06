@@ -80,16 +80,37 @@ func (l *Logger) Debug(msg string, fields ...zap.Field) {
 	l.zapper.Debug(msg, l.withCommon(fields...)...)
 }
 
+// DebugIf logs a message at DebugLevel if the error is not nil
+func (l *Logger) DebugIf(err error, msg string, fields ...zap.Field) {
+	if err != nil {
+		l.zapper.Debug(msg, l.withCommon(append(fields, zap.Error(err))...)...)
+	}
+}
+
 // Info logs a message at InfoLevel. The message includes any fields passed
 // at the log site, as well as any fields accumulated on the logger.
 func (l *Logger) Info(msg string, fields ...zap.Field) {
 	l.zapper.Info(msg, l.withCommon(fields...)...)
 }
 
+// InfoIf logs a message at InfoLevel if the error is not nil
+func (l *Logger) InfoIf(err error, msg string, fields ...zap.Field) {
+	if err != nil {
+		l.zapper.Info(msg, l.withCommon(append(fields, zap.Error(err))...)...)
+	}
+}
+
 // Warn logs a message at WarnLevel. The message includes any fields passed
 // at the log site, as well as any fields accumulated on the logger.
 func (l *Logger) Warn(msg string, fields ...zap.Field) {
 	l.zapper.Warn(msg, l.withCommon(fields...)...)
+}
+
+// WarnIf logs a message at WarnLevel if the error is not nil
+func (l *Logger) WarnIf(err error, msg string, fields ...zap.Field) {
+	if err != nil {
+		l.zapper.Warn(msg, l.withCommon(append(fields, zap.Error(err))...)...)
+	}
 }
 
 // Error logs a message at ErrorLevel. The message includes any fields passed
