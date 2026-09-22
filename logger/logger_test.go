@@ -263,3 +263,16 @@ func TestSetupOptions(t *testing.T) {
 		})
 	}
 }
+
+func TestWithOptions(t *testing.T) {
+	observedZapCore, observedLogs := observer.New(zap.InfoLevel)
+	original := &Logger{zapper: zap.NewNop()}
+
+	teed := original.WithOptions(zap.WrapCore(func(zapcore.Core) zapcore.Core { return observedZapCore }))
+
+	teed.Info("wrapped")
+	assert.Equal(t, 1, observedLogs.Len())
+
+	original.Info("not wrapped")
+	assert.Equal(t, 1, observedLogs.Len())
+}

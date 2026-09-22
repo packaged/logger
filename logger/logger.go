@@ -64,6 +64,15 @@ func (l *Logger) Clone() *Logger {
 	return &newLog
 }
 
+// WithOptions returns a clone of the logger with the zap options applied. An
+// option that inspects global state does so when it is applied, not at log time,
+// so apply it once that state exists rather than from init().
+func (l *Logger) WithOptions(opts ...zap.Option) *Logger {
+	newLog := l.Clone()
+	newLog.zapper = l.zapper.WithOptions(opts...)
+	return newLog
+}
+
 // AddCommon adds common fields to the logger
 func (l *Logger) AddCommon(fields ...zap.Field) {
 	l.common = append(l.common, fields...)
