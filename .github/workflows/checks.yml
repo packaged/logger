@@ -18,13 +18,18 @@ jobs:
         with:
           go-version: '1.20'
 
-      - name: WriteGoList
-        run: go list -json -m all > go.list
       - name: DependencyVulnerabilityScan
-        uses: sonatype-nexus-community/nancy-github-action@main
+        uses: golang/govulncheck-action@v1
+        with:
+          go-version-input: stable
 
       - name: Verify dependencies
+        if: always()
         run: go mod verify
+
+      - name: Unit Tests
+        if: always()
+        run: go test -v -coverprofile coverage.out ./...
 
       - name: Run go vet
         if: always()
@@ -51,10 +56,8 @@ jobs:
         env:
           GOROOT: ""
 
-      - name: Unit Tests
-        run: go test -v -coverprofile coverage.out ./...
-
       - name: Check Test coverage
+        if: always()
         env:
           TESTCOVERAGE_THRESHOLD: 100
         run: |
