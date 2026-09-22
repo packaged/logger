@@ -9,22 +9,26 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GO111MODULE: on
+      GOPROXY: https://proxy.golang.org,direct
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.20'
+          go-version: 'stable'
 
-      - name: WriteGoList
-        run: go list -json -m all > go.list
       - name: DependencyVulnerabilityScan
-        uses: sonatype-nexus-community/nancy-github-action@main
+        run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
 
       - name: Verify dependencies
+        if: always()
         run: go mod verify
+
+      - name: Unit Tests
+        if: always()
+        run: go test -v -coverprofile coverage.out ./...
 
       - name: Run go vet
         if: always()
@@ -51,10 +55,8 @@ jobs:
         env:
           GOROOT: ""
 
-      - name: Unit Tests
-        run: go test -v -coverprofile coverage.out ./...
-
       - name: Check Test coverage
+        if: always()
         env:
           TESTCOVERAGE_THRESHOLD: 100
         run: |

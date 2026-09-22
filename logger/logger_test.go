@@ -159,6 +159,42 @@ func TestLogger_ErrorIf(t *testing.T) {
 	assert.Len(t, logs, 1)
 }
 
+func TestLogger_DebugIf(t *testing.T) {
+	observedZapCore, observedLogs := observer.New(zapcore.DebugLevel)
+	l := &Logger{zapper: zap.New(observedZapCore)}
+	l.DebugIf(nil, "test")
+	logs := observedLogs.TakeAll()
+	assert.Len(t, logs, 0)
+
+	l.DebugIf(errors.New("test"), "test")
+	logs = observedLogs.TakeAll()
+	assert.Len(t, logs, 1)
+}
+
+func TestLogger_InfoIf(t *testing.T) {
+	observedZapCore, observedLogs := observer.New(zapcore.InfoLevel)
+	l := &Logger{zapper: zap.New(observedZapCore)}
+	l.InfoIf(nil, "test")
+	logs := observedLogs.TakeAll()
+	assert.Len(t, logs, 0)
+
+	l.InfoIf(errors.New("test"), "test")
+	logs = observedLogs.TakeAll()
+	assert.Len(t, logs, 1)
+}
+
+func TestLogger_WarnIf(t *testing.T) {
+	observedZapCore, observedLogs := observer.New(zapcore.WarnLevel)
+	l := &Logger{zapper: zap.New(observedZapCore)}
+	l.WarnIf(nil, "test")
+	logs := observedLogs.TakeAll()
+	assert.Len(t, logs, 0)
+
+	l.WarnIf(errors.New("test"), "test")
+	logs = observedLogs.TakeAll()
+	assert.Len(t, logs, 1)
+}
+
 func TestLogger_FatalIf(t *testing.T) {
 	observedZapCore, observedLogs := observer.New(zapcore.ErrorLevel)
 	l := &Logger{zapper: zap.New(observedZapCore, zap.WithFatalHook(zapcore.WriteThenPanic))}
@@ -262,4 +298,17 @@ func TestSetupOptions(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestWithOptions(t *testing.T) {
+	observedZapCore, observedLogs := observer.New(zap.InfoLevel)
+	original := &Logger{zapper: zap.NewNop()}
+
+	teed := original.WithOptions(zap.WrapCore(func(zapcore.Core) zapcore.Core { return observedZapCore }))
+
+	teed.Info("wrapped")
+	assert.Equal(t, 1, observedLogs.Len())
+
+	original.Info("not wrapped")
+	assert.Equal(t, 1, observedLogs.Len())
 }
